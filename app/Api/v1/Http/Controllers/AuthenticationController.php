@@ -40,27 +40,33 @@ class AuthenticationController extends Controller
      *     required=true,
      *     content={@OA\MediaType(
      *       mediaType="application/json",
+     *
      *       @OA\Schema(
      *         type="object",
      *         required={"email","password"},
+     *
      *         @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
      *         @OA\Property(property="password", type="string", format="password", example="a1b2c3d4e5")
      *       )
      *     )}
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Successful login",
      *     content={@OA\MediaType(
      *       mediaType="application/json",
+     *
      *       @OA\Schema(
      *         type="object",
+     *
      *         @OA\Property(property="access_token", type="string"),
      *         @OA\Property(property="token_type", type="string", example="bearer"),
      *         @OA\Property(property="expires_in", type="integer", example=3600)
      *       )
      *     )}
      *   ),
+     *
      *   @OA\Response(response=401, description="Invalid credentials")
      * )
      */
@@ -87,19 +93,23 @@ class AuthenticationController extends Controller
      *   tags={"Auth"},
      *   summary="Retrieve authenticated user",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Authenticated user",
      *     content={@OA\MediaType(
      *       mediaType="application/json",
+     *
      *       @OA\Schema(
      *         type="object",
+     *
      *         @OA\Property(property="id", type="integer", example=1),
      *         @OA\Property(property="name", type="string", example="Admin"),
      *         @OA\Property(property="email", type="string", format="email", example="admin@example.com")
      *       )
      *     )}
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
@@ -116,17 +126,21 @@ class AuthenticationController extends Controller
      *   tags={"Auth"},
      *   summary="Logout and invalidate current token",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Logged out",
      *     content={@OA\MediaType(
      *       mediaType="application/json",
+     *
      *       @OA\Schema(
      *         type="object",
+     *
      *         @OA\Property(property="message", type="string", example="Logged out")
      *       )
      *     )}
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
@@ -145,19 +159,23 @@ class AuthenticationController extends Controller
      *   tags={"Auth"},
      *   summary="Refresh JWT",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Response(
      *     response=200,
      *     description="New token issued",
      *     content={@OA\MediaType(
      *       mediaType="application/json",
+     *
      *       @OA\Schema(
      *         type="object",
+     *
      *         @OA\Property(property="access_token", type="string"),
      *         @OA\Property(property="token_type", type="string", example="bearer"),
      *         @OA\Property(property="expires_in", type="integer", example=3600)
      *       )
      *     )}
      *   ),
+     *
      *   @OA\Response(response=401, description="Token refresh failed")
      * )
      */
