@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\User;
+use App\Models\Collaborator;
+use App\Policies\CollaboratorPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -13,7 +13,9 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @var array<class-string, class-string>
      */
-    protected $policies = [];
+    protected $policies = [
+        Collaborator::class => CollaboratorPolicy::class,
+    ];
 
     /**
      * Register any authentication / authorization services.
