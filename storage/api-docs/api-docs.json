@@ -11,6 +11,85 @@
         }
     ],
     "paths": {
+        "/api/v1/collaborators/import": {
+            "post": {
+                "tags": [
+                    "Collaborators"
+                ],
+                "summary": "Import collaborators asynchronously",
+                "description": "Uploads a CSV file and schedules the import job.",
+                "operationId": "502cfdbecf20fae29cc9318d62ef0a25",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "schema": "ImportCollaboratorsUpload",
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "CSV file containing collaborators to import",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Import started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Processing started successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "schema": "ValidationErrorsArrayOfStrings",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [
@@ -198,10 +277,613 @@
                     }
                 ]
             }
+        },
+        "/api/v1/collaborators": {
+            "get": {
+                "tags": [
+                    "Collaborators"
+                ],
+                "summary": "List collaborators for the authenticated user",
+                "description": "List collaborators",
+                "operationId": "c75d74590883ff3a8934d5c738b64f44",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Filter collaborators by name, email or CPF",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of collaborators",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CollaboratorCollection"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Collaborators"
+                ],
+                "summary": "Create a collaborator",
+                "description": "Create a collaborator",
+                "operationId": "91b4207d9675050a933655d96005f594",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CollaboratorStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Collaborator created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CollaboratorResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "schema": "ValidationErrorsArrayOfStringsForStore",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/collaborators/{collaborator}": {
+            "get": {
+                "tags": [
+                    "Collaborators"
+                ],
+                "summary": "Retrieve a single collaborator",
+                "description": "Show a collaborator",
+                "operationId": "ef2805c4c4a2dc96bfa8afea754d35e7",
+                "parameters": [
+                    {
+                        "name": "collaborator",
+                        "in": "path",
+                        "description": "Collaborator identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Collaborator details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CollaboratorResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Collaborators"
+                ],
+                "summary": "Replace collaborator data",
+                "description": "Update a collaborator",
+                "operationId": "3bbd8f92b6dfde3bde91985370402922",
+                "parameters": [
+                    {
+                        "name": "collaborator",
+                        "in": "path",
+                        "description": "Collaborator identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CollaboratorUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Collaborator updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CollaboratorResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "schema": "ValidationErrorsArrayOfStringsForUpdate",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Collaborators"
+                ],
+                "summary": "Delete a collaborator",
+                "description": "Delete a collaborator",
+                "operationId": "272133f98dcfcf9ad3c112d5a4d1c3c6",
+                "parameters": [
+                    {
+                        "name": "collaborator",
+                        "in": "path",
+                        "description": "Collaborator identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Collaborator deleted"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Collaborators"
+                ],
+                "summary": "Partially update collaborator data",
+                "operationId": "bd69a76275eeb654d091d22ec1cf2805",
+                "parameters": [
+                    {
+                        "name": "collaborator",
+                        "in": "path",
+                        "description": "Collaborator identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CollaboratorUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Collaborator updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CollaboratorResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "schema": "ValidationErrorsArrayOfStringsForPatch",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
+        "schemas": {
+            "ValidationErrorsArrayOfStrings": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "CollaboratorData": {
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "cpf",
+                    "cpfFormatted",
+                    "city",
+                    "state",
+                    "createdAt",
+                    "updatedAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Maria Souza"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "maria@example.com"
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "12345678901"
+                    },
+                    "cpfFormatted": {
+                        "type": "string",
+                        "example": "123.456.789-01"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "São Paulo"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "SP"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T12:00:00Z"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-02T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "CollaboratorResource": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/CollaboratorData"
+                    }
+                },
+                "type": "object"
+            },
+            "CollaboratorCollection": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CollaboratorData"
+                        }
+                    },
+                    "links": {
+                        "properties": {
+                            "first": {
+                                "type": "string",
+                                "example": "https://api.example.com/api/v1/collaborators?page=1",
+                                "nullable": true
+                            },
+                            "last": {
+                                "type": "string",
+                                "example": "https://api.example.com/api/v1/collaborators?page=5",
+                                "nullable": true
+                            },
+                            "prev": {
+                                "type": "string",
+                                "example": null,
+                                "nullable": true
+                            },
+                            "next": {
+                                "type": "string",
+                                "example": "https://api.example.com/api/v1/collaborators?page=2",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "meta": {
+                        "properties": {
+                            "current_page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "from": {
+                                "type": "integer",
+                                "example": 1,
+                                "nullable": true
+                            },
+                            "last_page": {
+                                "type": "integer",
+                                "example": 5
+                            },
+                            "links": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "url": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "label": {
+                                            "type": "string"
+                                        },
+                                        "active": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "path": {
+                                "type": "string",
+                                "example": "https://api.example.com/api/v1/collaborators"
+                            },
+                            "per_page": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "to": {
+                                "type": "integer",
+                                "example": 15,
+                                "nullable": true
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 57
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "CollaboratorStoreRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "cpf",
+                    "city",
+                    "state"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Maria Souza"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "maria@example.com"
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "12345678901"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "São Paulo"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "SP"
+                    }
+                },
+                "type": "object"
+            },
+            "CollaboratorUpdateRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Maria Souza"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "maria@example.com"
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "12345678901"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "São Paulo"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "SP"
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationErrorsArrayOfStringsForStore": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "ValidationErrorsArrayOfStringsForUpdate": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "ValidationErrorsArrayOfStringsForPatch": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        },
         "requestBodies": {
+            "ImportCollaboratorsRequest": {
+                "required": true,
+                "content": {
+                    "multipart/form-data": {
+                        "schema": {
+                            "schema": "ImportCollaboratorsUpload",
+                            "required": [
+                                "file"
+                            ],
+                            "properties": {
+                                "file": {
+                                    "description": "CSV file containing collaborators to import",
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
             "LoginRequest": {
                 "required": true,
                 "content": {
@@ -227,6 +909,36 @@
                         }
                     }
                 }
+            },
+            "StoreCollaboratorRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/CollaboratorStoreRequest"
+                        }
+                    }
+                }
+            },
+            "UpdateCollaboratorRequest": {
+                "required": false,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/CollaboratorUpdateRequest"
+                        }
+                    }
+                }
+            },
+            "PartialUpdateCollaboratorRequest": {
+                "required": false,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/CollaboratorUpdateRequest"
+                        }
+                    }
+                }
             }
         },
         "securitySchemes": {
@@ -239,6 +951,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Collaborators",
+            "description": "Manage collaborators for the authenticated user"
+        },
         {
             "name": "Auth",
             "description": "Auth"
