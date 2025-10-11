@@ -14,10 +14,14 @@ class AuthenticationController extends Controller
     {
         $credentials = $request->validated();
 
-        if (! $token = Auth::guard('api')->attempt($credentials)) {
+        /** @var string|false $token */
+        $token = Auth::guard('api')->attempt($credentials);
+
+        if ($token === false) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        /** @var string $token */
         return $this->respondWithToken($token);
     }
 
@@ -46,7 +50,8 @@ class AuthenticationController extends Controller
 
     protected function respondWithToken(string $token): JsonResponse
     {
-        $ttlMinutes = (int) config('jwt.ttl', 60);
+        $ttlConfig = config('jwt.ttl');
+        $ttlMinutes = is_numeric($ttlConfig) ? (int) $ttlConfig : 60;
 
         return response()->json([
             'access_token' => $token,
