@@ -12,10 +12,22 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => 'a1b2c3d4e5',
-        ]);
+        $users = [
+            [
+                'name' => 'Admin User',
+                'email' => 'admin@example.com',
+            ],
+            [
+                'name' => 'Manager User',
+                'email' => 'manager@example.com',
+            ],
+        ];
+
+        foreach ($users as $user) {
+            User::factory()->create([
+                ...$user,
+                'password' => 'a1b2c3d4e5',
+            ]);
+        }
     }
 }
