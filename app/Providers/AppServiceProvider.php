@@ -17,10 +17,8 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
-
-        Model::shouldBeStrict(
-            app()->isLocal()
-        );
+        // this prevents lazy loading
+        Model::shouldBeStrict(app()->isLocal());
 
         // https://laravel.com/docs/12.x/eloquent-relationships#automatic-eager-loading
         Model::automaticallyEagerLoadRelationships();
