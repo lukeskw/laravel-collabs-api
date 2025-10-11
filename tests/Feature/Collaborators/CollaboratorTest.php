@@ -128,7 +128,7 @@ it('imports collaborators from CSV and notifies the manager', function (): void 
     );
 
     $response->assertAccepted();
-    $response->assertJsonPath('message', 'Processamento iniciado com sucesso');
+    $response->assertJsonPath('message', trans('general.import_started'));
 
     $this->assertDatabaseHas('collaborators', [
         'user_id' => $user->id,
