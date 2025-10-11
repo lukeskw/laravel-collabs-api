@@ -1,0 +1,12 @@
+{
+  "preset": "laravel",
+  "phpVersion": "8.2",
+  "exclude": [
+    "vendor",
+    "storage",
+    "bootstrap/cache",
+    "node_modules",
+    "public/build"
+  ]
+}
+
