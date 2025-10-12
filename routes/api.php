@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
     ->as('api.v1.')
-    ->middleware('throttle:api')
+    ->middleware('throttle:60,1') // 60 requests per minute
     ->group(function (): void {
         Route::prefix('auth')
             ->as('auth.')

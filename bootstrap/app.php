@@ -29,13 +29,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // Usando Redis throttle pro rate limiting
         $middleware->throttleWithRedis();
 
-        // Define um API rate limiter
-        RateLimiter::for('api', function (Request $request) {
-            $perMinute = (int) env('API_RATE_LIMIT', 60);
-
-            return Limit::perMinute($perMinute)
-                ->by(optional($request->user())->id ?: $request->ip());
-        });
     })
 
     // Configuração personalizada para tratamento de exceções, já tinha implementado em projetos anteriores.
