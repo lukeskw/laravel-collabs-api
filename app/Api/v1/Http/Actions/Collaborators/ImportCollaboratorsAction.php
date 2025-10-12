@@ -30,12 +30,15 @@ class ImportCollaboratorsAction
      *     request="ImportCollaboratorsRequest",
      *     required=true,
      *     content={
+     *
      *       @OA\MediaType(
      *         mediaType="multipart/form-data",
+     *
      *         @OA\Schema(
      *           schema="ImportCollaboratorsUpload",
      *           type="object",
      *           required={"file"},
+     *
      *           @OA\Property(
      *             property="file",
      *             type="string",
@@ -46,20 +49,26 @@ class ImportCollaboratorsAction
      *       )
      *     }
      *   ),
+     *
      *   @OA\Response(
      *     response=202,
      *     description="Import started",
+     *
      *     @OA\JsonContent(
      *       type="object",
+     *
      *       @OA\Property(property="message", type="string", example="Processing started successfully.")
      *     )
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated"),
      *   @OA\Response(
      *     response=422,
      *     description="Validation error",
+     *
      *     @OA\JsonContent(
      *       type="object",
+     *
      *       @OA\Property(
      *         property="errors",
      *         type="object",

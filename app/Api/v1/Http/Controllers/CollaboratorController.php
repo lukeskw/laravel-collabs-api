@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   schema="CollaboratorData",
  *   type="object",
  *   required={"id","name","email","cpf","cpfFormatted","city","state","createdAt","updatedAt"},
+ *
  *   @OA\Property(property="id", type="integer", example=1),
  *   @OA\Property(property="name", type="string", example="Maria Souza"),
  *   @OA\Property(property="email", type="string", format="email", example="maria@example.com"),
@@ -39,17 +40,21 @@ use Symfony\Component\HttpFoundation\Response;
  * @OA\Schema(
  *   schema="CollaboratorResource",
  *   type="object",
+ *
  *   @OA\Property(property="data", ref="#/components/schemas/CollaboratorData")
  * )
  *
  * @OA\Schema(
  *   schema="CollaboratorCollection",
  *   type="object",
+ *
  *   @OA\Property(
  *     property="data",
  *     type="array",
+ *
  *     @OA\Items(ref="#/components/schemas/CollaboratorData")
  *   ),
+ *
  *   @OA\Property(
  *     property="links",
  *     type="object",
@@ -67,8 +72,10 @@ use Symfony\Component\HttpFoundation\Response;
  *     @OA\Property(
  *       property="links",
  *       type="array",
+ *
  *       @OA\Items(
  *         type="object",
+ *
  *         @OA\Property(property="url", type="string", nullable=true),
  *         @OA\Property(property="label", type="string"),
  *         @OA\Property(property="active", type="boolean")
@@ -85,6 +92,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   schema="CollaboratorStoreRequest",
  *   type="object",
  *   required={"name","email","cpf","city","state"},
+ *
  *   @OA\Property(property="name", type="string", example="Maria Souza"),
  *   @OA\Property(property="email", type="string", format="email", example="maria@example.com"),
  *   @OA\Property(property="cpf", type="string", example="12345678901"),
@@ -95,6 +103,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @OA\Schema(
  *   schema="CollaboratorUpdateRequest",
  *   type="object",
+ *
  *   @OA\Property(property="name", type="string", example="Maria Souza"),
  *   @OA\Property(property="email", type="string", format="email", example="maria@example.com"),
  *   @OA\Property(property="cpf", type="string", example="12345678901"),
@@ -123,18 +132,23 @@ class CollaboratorController extends Controller
      *   tags={"Collaborators"},
      *   summary="List collaborators for the authenticated user",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Parameter(
      *     name="search",
      *     in="query",
      *     description="Filter collaborators by name, email or CPF",
      *     required=false,
+     *
      *     @OA\Schema(type="string")
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Paginated list of collaborators",
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorCollection")
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated"),
      *   @OA\Response(response=403, description="Forbidden")
      * )
@@ -173,20 +187,26 @@ class CollaboratorController extends Controller
      *   requestBody=@OA\RequestBody(
      *     request="StoreCollaboratorRequest",
      *     required=true,
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorStoreRequest")
      *   ),
+     *
      *   @OA\Response(
      *     response=201,
      *     description="Collaborator created",
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorResource")
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated"),
      *   @OA\Response(response=403, description="Forbidden"),
      *   @OA\Response(
      *     response=422,
      *     description="Validation error",
+     *
      *     @OA\JsonContent(
      *       type="object",
+     *
      *       @OA\Property(
      *         property="errors",
      *         type="object",
@@ -217,18 +237,23 @@ class CollaboratorController extends Controller
      *   tags={"Collaborators"},
      *   summary="Retrieve a single collaborator",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Parameter(
      *     name="collaborator",
      *     in="path",
      *     required=true,
      *     description="Collaborator identifier",
+     *
      *     @OA\Schema(type="integer")
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Collaborator details",
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorResource")
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated"),
      *   @OA\Response(response=403, description="Forbidden"),
      *   @OA\Response(response=404, description="Not found")
@@ -249,31 +274,39 @@ class CollaboratorController extends Controller
      *   tags={"Collaborators"},
      *   summary="Replace collaborator data",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Parameter(
      *     name="collaborator",
      *     in="path",
      *     required=true,
      *     description="Collaborator identifier",
+     *
      *     @OA\Schema(type="integer")
      *   ),
      *   requestBody=@OA\RequestBody(
      *     request="UpdateCollaboratorRequest",
      *     required=false,
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorUpdateRequest")
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Collaborator updated",
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorResource")
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated"),
      *   @OA\Response(response=403, description="Forbidden"),
      *   @OA\Response(response=404, description="Not found"),
      *   @OA\Response(
      *     response=422,
      *     description="Validation error",
+     *
      *     @OA\JsonContent(
      *       type="object",
+     *
      *       @OA\Property(
      *         property="errors",
      *         type="object",
@@ -288,31 +321,39 @@ class CollaboratorController extends Controller
      *   tags={"Collaborators"},
      *   summary="Partially update collaborator data",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Parameter(
      *     name="collaborator",
      *     in="path",
      *     required=true,
      *     description="Collaborator identifier",
+     *
      *     @OA\Schema(type="integer")
      *   ),
      *   requestBody=@OA\RequestBody(
      *     request="PartialUpdateCollaboratorRequest",
      *     required=false,
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorUpdateRequest")
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Collaborator updated",
+     *
      *     @OA\JsonContent(ref="#/components/schemas/CollaboratorResource")
      *   ),
+     *
      *   @OA\Response(response=401, description="Unauthenticated"),
      *   @OA\Response(response=403, description="Forbidden"),
      *   @OA\Response(response=404, description="Not found"),
      *   @OA\Response(
      *     response=422,
      *     description="Validation error",
+     *
      *     @OA\JsonContent(
      *       type="object",
+     *
      *       @OA\Property(
      *         property="errors",
      *         type="object",
@@ -341,13 +382,16 @@ class CollaboratorController extends Controller
      *   tags={"Collaborators"},
      *   summary="Delete a collaborator",
      *   security={{"bearerAuth": {}}},
+     *
      *   @OA\Parameter(
      *     name="collaborator",
      *     in="path",
      *     required=true,
      *     description="Collaborator identifier",
+     *
      *     @OA\Schema(type="integer")
      *   ),
+     *
      *   @OA\Response(response=204, description="Collaborator deleted"),
      *   @OA\Response(response=401, description="Unauthenticated"),
      *   @OA\Response(response=403, description="Forbidden"),
