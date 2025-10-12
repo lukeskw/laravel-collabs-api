@@ -143,3 +143,4 @@ Após login, use o token JWT retornado no header `Authorization: Bearer <TOKEN>`
 - Setei o limite do CSV como 20mb, mas poderíamos usar chunk-uploads via TUS Protocol ou S3 pre-signed pra arquivos maiores.
 - Pensar em alguma forma de adicionar idempotência no upload pra evitar reprocessamento do mesmo arquivo
 - Adicionar observabilidade nessa aplicação, de preferência via OTEL pra evitar vendor lock.
+- Usar a spatie/laravel-data pra melhorar e simplificar a tipagem dos Data Transfer Objects
