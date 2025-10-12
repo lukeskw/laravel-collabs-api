@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Contracts\CollaboratorsImporterContract;
 use App\DataTransferObjects\CollaboratorsImportResult;
+use App\Mail\CollaboratorsImportFailedMail;
 use App\Mail\CollaboratorsImportedMail;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -57,12 +59,30 @@ class ProcessCollaboratorsImport implements ShouldQueue
             throw $exception;
         }
 
+        Log::info('Collaborators import completed', ['user_id' => $user->id, 'imported' => $result]);
         return $result;
     }
 
-    public function failed(): void
+    public function failed(?Throwable $exception = null): void
     {
-        // TODO: enviar email de falha
+        $user = User::query()->find($this->userId);
+
+        if ($user !== null) {
+            $fileName = basename($this->path);
+            $errorMessage = $exception?->getMessage();
+
+            Mail::to($user)->queue(
+                new CollaboratorsImportFailedMail($fileName, $errorMessage)
+            );
+        }
+
+        Log::error('Collaborators import failed', [
+            'user_id' => $this->userId,
+            'path' => $this->path,
+            'disk' => $this->disk,
+            'error' => $exception?->getMessage(),
+        ]);
+
         $this->deleteFile();
     }
 
