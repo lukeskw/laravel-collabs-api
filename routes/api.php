@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
     ->as('api.v1.')
+    ->middleware('throttle:api')
     ->group(function (): void {
         Route::prefix('auth')
             ->as('auth.')

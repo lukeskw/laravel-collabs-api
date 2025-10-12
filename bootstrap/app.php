@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -24,7 +26,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Usando Redis throttle pro rate limiting
+        $middleware->throttleWithRedis();
+
+        // Define um API rate limiter
+        RateLimiter::for('api', function (Request $request) {
+            $perMinute = (int) env('API_RATE_LIMIT', 60);
+
+            return Limit::perMinute($perMinute)
+                ->by(optional($request->user())->id ?: $request->ip());
+        });
     })
 
     // Configuração personalizada para tratamento de exceções, já tinha implementado em projetos anteriores.
