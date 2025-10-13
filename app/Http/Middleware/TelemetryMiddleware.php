@@ -69,6 +69,8 @@ class TelemetryMiddleware
         $baseAttributes = $this->buildBaseAttributes($request);
         $this->incrementActiveRequests($baseAttributes);
 
+        $status = 500;
+
         try {
             /** @var Response $response */
             $response = $next($request);
@@ -90,8 +92,10 @@ class TelemetryMiddleware
             return $response;
         } catch (Throwable $throwable) {
             $status = 500;
-            $span->setAttribute('http.response.status_code', $status);
-            $span->recordException($throwable);
+            $span->recordException($throwable, [
+                'exception.message' => $throwable->getMessage(),
+                'exception.type' => $throwable::class,
+            ]);
             $span->setStatus(StatusCode::STATUS_ERROR, $throwable->getMessage());
 
             $duration = $this->calculateDurationSeconds($start);
@@ -100,6 +104,7 @@ class TelemetryMiddleware
 
             throw $throwable;
         } finally {
+            $span->setAttribute('http.response.status_code', $status);
             $this->decrementActiveRequests($baseAttributes);
             $span->end();
             $scope->detach();
@@ -203,8 +208,6 @@ class TelemetryMiddleware
         $attributes = $this->buildMetricAttributes($request, $statusCode);
         $this->getRequestDurationHistogram($meter)->record($durationSeconds, $attributes);
         $this->getRequestCounter($meter)->add(1, $attributes);
-
-        // metrics flushed on application termination
     }
 
     private function emitLog(Request $request, int $statusCode, float $durationSeconds, SpanInterface $span, ?Throwable $throwable = null): void
@@ -241,8 +244,6 @@ class TelemetryMiddleware
         }
 
         $logger->emit($record);
-
-        // logs flushed on application termination
     }
 
     private function getLogger(): ?LoggerInterface
