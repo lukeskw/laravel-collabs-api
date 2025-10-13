@@ -114,7 +114,7 @@ Veja a seção [Postman](#postman) para as rotas completas, ou o [Swagger](http:
 
 ## Testes e Coverage
 - Rodar testes: `sail pest --coverage --parallel`
-- Resultado atual: 14 testes, 54 assertions, ~81% coverage.
+- Resultado atual: 22 testes, 143 assertions, ~87% coverage.
 - Pra aumentar a cobertura, precisaria escrever mais testes unitários para os arquivos mostrados no relatório.
 
 ## Qualidade de Código
