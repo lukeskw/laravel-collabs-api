@@ -161,4 +161,5 @@ A aplicação expõe traces, métricas e logs por meio de OpenTelemetry usando o
 - [ ] Setei o limite do CSV como 20mb, mas poderíamos usar chunk-uploads via TUS Protocol ou S3 pre-signed pra arquivos maiores.
 - [ ] Pensar em alguma forma de adicionar idempotência no upload pra evitar reprocessamento do mesmo arquivo
 - [ ] Usar a spatie/laravel-data pra melhorar e simplificar a tipagem dos Data Transfer Objects
+- [ ] Adicionar uma pipeline de CI/CD
 - [x] Adicionar observabilidade nessa aplicação, de preferência via OTEL pra evitar vendor lock.
