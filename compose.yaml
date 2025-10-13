@@ -25,6 +25,7 @@ services:
             - pgsql
             - redis
             - mailpit
+            - otel-collector
     pgsql:
         image: 'postgres:17-alpine'
         ports:
@@ -70,6 +71,24 @@ services:
         ports:
             - '${FORWARD_MAILPIT_PORT:-1025}:1025'
             - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - sail
+    otel-collector:
+        image: 'newrelic/nr-otel-collector:0.8.10'
+        environment:
+            NEW_RELIC_LICENSE_KEY: '${NEW_RELIC_LICENSE_KEY}'
+            NEW_RELIC_REGION: '${NEW_RELIC_REGION:-us}'
+            NEW_RELIC_MEMORY_LIMIT_MIB: '${NEW_RELIC_MEMORY_LIMIT_MIB:-512}'
+            NEW_RELIC_OTLP_BASE_ENDPOINT: '${NEW_RELIC_OTLP_BASE_ENDPOINT:-https://otlp.nr-data.net}'
+            NEW_RELIC_TRACES_ENDPOINT: '${NEW_RELIC_TRACES_ENDPOINT:-https://otlp.nr-data.net/v1/traces}'
+            NEW_RELIC_METRICS_ENDPOINT: '${NEW_RELIC_METRICS_ENDPOINT:-https://otlp.nr-data.net/v1/metrics}'
+            NEW_RELIC_LOGS_ENDPOINT: '${NEW_RELIC_LOGS_ENDPOINT:-https://otlp.nr-data.net/v1/logs}'
+        volumes:
+            - './docker/otel-collector/config.yaml:/etc/newrelic-otel-collector/config.yaml:ro'
+        ports:
+            - '${FORWARD_OTEL_HTTP_PORT:-4318}:4318'
+            - '${FORWARD_OTEL_GRPC_PORT:-4317}:4317'
+        command: ['--config=/etc/newrelic-otel-collector/config.yaml']
         networks:
             - sail
 networks:
