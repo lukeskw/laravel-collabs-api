@@ -7,12 +7,12 @@ use App\Api\v1\Http\Requests\Collaborator\UpdateCollaboratorRequest;
 use App\Api\v1\Http\Resources\CollaboratorResource;
 use App\Contracts\CollaboratorServiceContract;
 use App\Models\Collaborator;
+use App\Support\Cache\CollaboratorsCache;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -166,7 +166,7 @@ class CollaboratorController extends Controller
         );
 
         // usando a nova API de SWR do laravel 12. Referência: https://laravel.com/docs/12.x/cache#swr
-        $collaborators = Cache::flexible($cacheKey, [
+        $collaborators = CollaboratorsCache::storeForUser($userId)->flexible($cacheKey, [
             self::COLLABORATOR_CACHE_REFRESH_AFTER_SECONDS,
             self::COLLABORATOR_CACHE_EXPIRES_AFTER_SECONDS,
         ], function () use ($userId, $search) {
@@ -223,6 +223,7 @@ class CollaboratorController extends Controller
         $userId = $this->authenticatedUserId();
 
         $collaborator = $this->collaboratorService->createForUserId($userId, $request->validatedData());
+        CollaboratorsCache::flushForUser($userId);
 
         return CollaboratorResource::make($collaborator)
             ->response()
@@ -370,6 +371,7 @@ class CollaboratorController extends Controller
         $userId = $this->authenticatedUserId();
 
         $updatedCollaborator = $this->collaboratorService->updateForUserId($userId, $collaborator, $request->validatedData());
+        CollaboratorsCache::flushForUser($userId);
 
         return CollaboratorResource::make($updatedCollaborator);
     }
@@ -405,6 +407,7 @@ class CollaboratorController extends Controller
         $userId = $this->authenticatedUserId();
 
         $this->collaboratorService->deleteForUserId($userId, $collaborator);
+        CollaboratorsCache::flushForUser($userId);
 
         return response()->noContent();
     }

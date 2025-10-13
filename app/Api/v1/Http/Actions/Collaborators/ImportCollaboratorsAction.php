@@ -5,6 +5,7 @@ namespace App\Api\v1\Http\Actions\Collaborators;
 use App\Api\v1\Http\Requests\Collaborator\ImportCollaboratorsRequest;
 use App\Jobs\ProcessCollaboratorsImport;
 use App\Models\Collaborator;
+use App\Support\Cache\CollaboratorsCache;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -102,7 +103,10 @@ class ImportCollaboratorsAction
             ]);
         }
 
-        ProcessCollaboratorsImport::dispatch($this->authenticatedUserId(), $path, $disk);
+        $userId = $this->authenticatedUserId();
+
+        ProcessCollaboratorsImport::dispatch($userId, $path, $disk);
+        CollaboratorsCache::flushForUser($userId);
 
         return response()->json([
             'message' => trans('general.import_started'),
