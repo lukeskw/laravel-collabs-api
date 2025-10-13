@@ -4,8 +4,8 @@ namespace App\Jobs;
 
 use App\Contracts\CollaboratorsImporterContract;
 use App\DataTransferObjects\CollaboratorsImportResult;
-use App\Mail\CollaboratorsImportFailedMail;
 use App\Mail\CollaboratorsImportedMail;
+use App\Mail\CollaboratorsImportFailedMail;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -60,6 +60,7 @@ class ProcessCollaboratorsImport implements ShouldQueue
         }
 
         Log::info('Collaborators import completed', ['user_id' => $user->id, 'imported' => $result]);
+
         return $result;
     }
 
