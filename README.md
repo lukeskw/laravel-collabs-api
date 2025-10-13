@@ -136,11 +136,29 @@ Após login, use o token JWT retornado no header `Authorization: Bearer <TOKEN>`
 - Use as rotas autenticadas: as requisições já usam Bearer Token `{{token}}` automaticamente.
 - Import CSV: na requisição `collaborators/import`, selecione o arquivo no campo `file` (ex.: `employees.csv` na raiz do projeto). Ajuste o caminho do arquivo conforme seu sistema.
 
+## Observabilidade
+A aplicação expõe traces, métricas e logs por meio de OpenTelemetry usando o `TelemetryMiddleware` e o `TelemetryServiceProvider`. O tráfego sai da aplicação para o collector local (`otel-collector`) e, de lá, segue para o New Relic (ou outro APM configurado).
+
+### Como habilitar
+1. No `.env`, ajuste `OTEL_ENABLED=true`, defina `OTEL_SERVICE_NAME` (opcional) e, se quiser, `OTEL_RESOURCE_ATTRIBUTES` para adicionar metadados.
+2. Preencha as variáveis `NEW_RELIC_*` (já listadas no `.env.example`) com a sua licença e endpoints desejados.
+3. Suba os containers com `./vendor/bin/sail up -d`. O serviço `otel-collector` está definido no `compose.yaml` e usa `docker/otel-collector/config.yaml` para as rotas OTLP.
+4. Após alguns minutos, confira no New Relic (ou ferramenta equivalente) se traces, métricas e logs estão chegando.
+
+### Observação
+- Para outro provedor, ajuste os endpoints no `.env` e em `docker/otel-collector/config.yaml`.
+
+![Traces no New Relic](public/docs/traces.png)
+
+![Logs no New Relic](public/docs/logs.png)
+
+![Visão APM](public/docs/apm.png)
+
 ## Melhorias
-- A depender do frontend, é bom usarmos HTTP-Only Cookies na autenticação.
-- Talvez seja legal criar um Command pra importação de arquivos.
-- Instalação de Horizon e Telescope pra pra ajudar no debug dos jobs e requisições.
-- Setei o limite do CSV como 20mb, mas poderíamos usar chunk-uploads via TUS Protocol ou S3 pre-signed pra arquivos maiores.
-- Pensar em alguma forma de adicionar idempotência no upload pra evitar reprocessamento do mesmo arquivo
-- Adicionar observabilidade nessa aplicação, de preferência via OTEL pra evitar vendor lock.
-- Usar a spatie/laravel-data pra melhorar e simplificar a tipagem dos Data Transfer Objects
+- [ ] A depender do frontend, é bom usarmos HTTP-Only Cookies na autenticação.
+- [ ] Talvez seja legal criar um Command pra importação de arquivos.
+- [ ] Instalação de Horizon e Telescope pra pra ajudar no debug dos jobs e requisições.
+- [ ] Setei o limite do CSV como 20mb, mas poderíamos usar chunk-uploads via TUS Protocol ou S3 pre-signed pra arquivos maiores.
+- [ ] Pensar em alguma forma de adicionar idempotência no upload pra evitar reprocessamento do mesmo arquivo
+- [ ] Usar a spatie/laravel-data pra melhorar e simplificar a tipagem dos Data Transfer Objects
+- [x] Adicionar observabilidade nessa aplicação, de preferência via OTEL pra evitar vendor lock.
