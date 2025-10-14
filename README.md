@@ -1,4 +1,4 @@
-# Convenia Collaborators API
+# Collaborators API
 
 O projeto tem como objetivo facilitar a gestão de colaboradores por meio de uma interface que oferece operações básicas de CRUD (Create, Read, Update, Delete) e importação em massa de funcionários, via CSV.
 
@@ -128,7 +128,7 @@ Veja a seção [Postman](#postman) para as rotas completas, ou o [Swagger](http:
 Após login, use o token JWT retornado no header `Authorization: Bearer <TOKEN>` para acessar as rotas autenticadas.
 
 ## Postman
-- Coleção: importe `convenia.postman_collection.json` (raiz do projeto).
+- Coleção: importe `collabs.postman_collection.json` (raiz do projeto).
 - Ambiente (recomendo): crie um ambiente, selecione e defina as variáveis:
   - `base_url`: `http://localhost:8000`
   - `token`: deixe em branco (será preenchido automaticamente após login/refresh)
