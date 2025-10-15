@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'Convenia Collaborations API',
+                'title' => 'Collaborators API',
             ],
 
             'routes' => [

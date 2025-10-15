@@ -10,7 +10,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
  * @OA\Info(
- *   title="Convenia Collaborations API",
+ *   title="Collaborators API",
  *   version="1.0.0"
  * )
  *
