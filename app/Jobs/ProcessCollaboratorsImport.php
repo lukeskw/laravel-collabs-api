@@ -7,6 +7,7 @@ use App\DataTransferObjects\CollaboratorsImportResult;
 use App\Mail\CollaboratorsImportedMail;
 use App\Mail\CollaboratorsImportFailedMail;
 use App\Models\User;
+use App\Support\Cache\CollaboratorsCache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -46,6 +47,9 @@ class ProcessCollaboratorsImport implements ShouldQueue
 
         try {
             $result = $importer->import($user->id, $this->path, $this->disk);
+
+            CollaboratorsCache::flushForUser($user->id);
+
             Mail::to($user)->queue(new CollaboratorsImportedMail($result));
 
             $shouldDeleteFile = true;
@@ -70,7 +74,8 @@ class ProcessCollaboratorsImport implements ShouldQueue
 
         if ($user !== null) {
             $fileName = basename($this->path);
-            $errorMessage = $exception?->getMessage();
+
+            $errorMessage = trans('general.import_failed');
 
             Mail::to($user)->queue(
                 new CollaboratorsImportFailedMail($fileName, $errorMessage)
