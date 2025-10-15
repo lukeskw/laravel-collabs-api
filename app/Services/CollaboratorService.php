@@ -36,7 +36,7 @@ class CollaboratorService implements CollaboratorServiceContract
         $collaborator->user_id = $userId;
         $collaborator->save();
 
-        return $collaborator->refresh();
+        return $collaborator;
     }
 
     /**
@@ -50,7 +50,7 @@ class CollaboratorService implements CollaboratorServiceContract
         $collaborator->fill($data);
         $collaborator->save();
 
-        return $collaborator->refresh();
+        return $collaborator;
     }
 
     public function deleteForUserId(int $userId, Collaborator $collaborator): void
