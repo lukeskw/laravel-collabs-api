@@ -28,8 +28,9 @@ class CollaboratorBuilder extends Builder
     public function searchAndPaginateForUserId(int $userId, ?string $name = null): LengthAwarePaginator
     {
         return $this->forUserId($userId)
-            ->when($name !== null, static function (CollaboratorBuilder $query) use ($name): CollaboratorBuilder {
-                $query->where('name', 'ILIKE', "%{$name}%");
+            ->when($name !== null && $name !== '', static function (CollaboratorBuilder $query) use ($name): CollaboratorBuilder {
+                // SQLite and PostgreSQL compatibility
+                $query->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower((string) $name).'%']);
 
                 return $query;
             })
