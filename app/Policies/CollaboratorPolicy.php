@@ -7,9 +7,9 @@ use App\Models\User;
 
 class CollaboratorPolicy
 {
-    public function viewAny(): bool
+    public function viewAny(User $user): bool
     {
-        return true;
+        return (bool) $user->id;
     }
 
     public function view(User $user, Collaborator $collaborator): bool
@@ -17,9 +17,9 @@ class CollaboratorPolicy
         return $collaborator->user_id === $user->id;
     }
 
-    public function create(): bool
+    public function create(User $user): bool
     {
-        return true;
+        return (bool) $user->id;
     }
 
     public function update(User $user, Collaborator $collaborator): bool
