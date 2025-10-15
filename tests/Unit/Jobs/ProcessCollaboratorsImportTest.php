@@ -78,7 +78,7 @@ it('queues failure notification and removes the source file on failure', functio
     Mail::assertQueued(CollaboratorsImportFailedMail::class, static function (CollaboratorsImportFailedMail $mail) use ($user): bool {
         return $mail->hasTo($user->email)
             && $mail->fileName === 'failure.csv'
-            && $mail->errorMessage === 'Import failed';
+            && $mail->errorMessage === trans('general.import_failed');
     });
 
     $disk->assertMissing($path);
