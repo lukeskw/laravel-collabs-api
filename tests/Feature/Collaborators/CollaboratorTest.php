@@ -148,3 +148,65 @@ it('imports collaborators from CSV and notifies the manager', function (): void 
             && $mail->result->skipped === 1;
     });
 });
+
+it('paginates collaborators correctly across multiple pages', function (): void {
+    $user = User::factory()->create();
+
+    $collaborators = Collaborator::factory()->for($user)->count(25)->create();
+
+    $firstPageResponse = $this->getJson('/api/v1/collaborators?page=1', headers: apiHeaders($user));
+
+    $firstPageResponse->assertOk();
+    $firstPageResponse->assertJsonCount(15, 'data');
+    $firstPageResponse->assertJsonPath('meta.current_page', 1);
+    $firstPageResponse->assertJsonPath('meta.last_page', 2);
+    $firstPageResponse->assertJsonPath('meta.total', 25);
+    $firstPageResponse->assertJsonPath('meta.per_page', 15);
+
+    $firstPageIds = array_column($firstPageResponse->json('data'), 'id');
+
+    $secondPageResponse = $this->getJson('/api/v1/collaborators?page=2', headers: apiHeaders($user));
+
+    $secondPageResponse->assertOk();
+    $secondPageResponse->assertJsonCount(10, 'data');
+    $secondPageResponse->assertJsonPath('meta.current_page', 2);
+    $secondPageResponse->assertJsonPath('meta.last_page', 2);
+    $secondPageResponse->assertJsonPath('meta.total', 25);
+    $secondPageResponse->assertJsonPath('meta.from', 16);
+    $secondPageResponse->assertJsonPath('meta.to', 25);
+
+    $secondPageIds = array_column($secondPageResponse->json('data'), 'id');
+
+    expect(array_intersect($firstPageIds, $secondPageIds))->toBeEmpty();
+});
+
+it('paginates search results correctly', function (): void {
+    $user = User::factory()->create();
+
+    Collaborator::factory()->for($user)->count(20)->create(['name' => 'João Silva']);
+    Collaborator::factory()->for($user)->count(5)->create(['name' => 'Maria Santos']);
+
+    $firstPageResponse = $this->getJson(
+        '/api/v1/collaborators?search=João&page=1',
+        headers: apiHeaders($user)
+    );
+
+    $firstPageResponse->assertOk();
+    $firstPageResponse->assertJsonCount(15, 'data');
+    $firstPageResponse->assertJsonPath('meta.total', 20);
+    $firstPageResponse->assertJsonPath('meta.current_page', 1);
+
+    $secondPageResponse = $this->getJson(
+        '/api/v1/collaborators?search=João&page=2',
+        headers: apiHeaders($user)
+    );
+
+    $secondPageResponse->assertOk();
+    $secondPageResponse->assertJsonCount(5, 'data');
+    $secondPageResponse->assertJsonPath('meta.total', 20);
+    $secondPageResponse->assertJsonPath('meta.current_page', 2);
+
+    $firstPageIds = array_column($firstPageResponse->json('data'), 'id');
+    $secondPageIds = array_column($secondPageResponse->json('data'), 'id');
+    expect(array_intersect($firstPageIds, $secondPageIds))->toBeEmpty();
+});
