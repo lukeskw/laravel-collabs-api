@@ -2,6 +2,7 @@
 
 namespace App\Api\v1\Http\Controllers;
 
+use App\Api\v1\Http\Requests\Collaborator\IndexCollaboratorRequest;
 use App\Api\v1\Http\Requests\Collaborator\StoreCollaboratorRequest;
 use App\Api\v1\Http\Requests\Collaborator\UpdateCollaboratorRequest;
 use App\Api\v1\Http\Resources\CollaboratorResource;
@@ -10,7 +11,6 @@ use App\Models\Collaborator;
 use App\Support\Cache\CollaboratorsCache;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -153,16 +153,32 @@ class CollaboratorController extends Controller
      *   @OA\Response(response=403, description="Forbidden")
      * )
      */
-    public function index(Request $request): ResourceCollection
+    public function index(IndexCollaboratorRequest $request): ResourceCollection
     {
-        $this->authorize('viewAny', Collaborator::class);
-
+        /*
+    *   Eu poderia ter usado alguma lib para lidar com filtros, ordenações e afins, mas como o projeto é simples, preferi fazer na mão mesmo.
+    *   Das implementações que já usei:
+    *   spatie/laravel-query-builde https://github.com/spatie/laravel-query-builderr,
+    *   laravel-filter-querystring https://github.com/mehradsadeghi/laravel-filter-querystring,
+    *   implementação própria usando Laravel Pipelines https://laravel.com/docs/12.x/helpers#pipeline
+    */
         $userId = $this->authenticatedUserId();
-        $search = $this->searchTerm($request);
+        $validated = $request->validated();
+
+        /** @var string|null $search */
+        $search = $validated['search'] ?? null;
+
+        /** @var int|string|null $pageValue */
+        $pageValue = $validated['page'] ?? null;
+
+        /** @var int $page */
+        $page = $pageValue !== null ? (is_int($pageValue) ? $pageValue : (int) $pageValue) : 1;
+
         $cacheKey = sprintf(
-            'users:%d:collaborators:search:%s',
+            'users:%d:collaborators:search:%s:page:%d',
             $userId,
-            md5($search ?? '_all_')
+            md5($search ?? '_all_'),
+            $page
         );
 
         // usando a nova API de SWR do laravel 12. Referência: https://laravel.com/docs/12.x/cache#swr
@@ -421,23 +437,5 @@ class CollaboratorController extends Controller
         }
 
         return (int) $userId;
-    }
-
-    /*
-    *   Eu poderia ter usado alguma lib para lidar com filtros, ordenações e afins, mas como o projeto é simples, preferi fazer na mão mesmo.
-    *   Das implementações que já usei:
-    *   spatie/laravel-query-builde https://github.com/spatie/laravel-query-builderr,
-    *   laravel-filter-querystring https://github.com/mehradsadeghi/laravel-filter-querystring,
-    *   implementação própria usando Laravel Pipelines https://laravel.com/docs/12.x/helpers#pipeline
-    */
-    private function searchTerm(Request $request): ?string
-    {
-        if (! $request->filled('search')) {
-            return null;
-        }
-
-        $value = trim($request->string('search')->toString());
-
-        return $value === '' ? null : $value;
     }
 }
